@@ -64,15 +64,18 @@ export function createContact(contact: Omit<ContactInfo, 'photoURL'>, options?: 
  * @param contact - The contact to update
  * @returns the updated contact
  */
-export function updateContact(
+export async function updateContact(
   contact: Partial<ContactInfo> & { id: number },
   options?: Options<'json'>,
 ): Promise<Contact> {
   // to simulate server errros
-  // if (Math.random() > 0.75) {
-  //   throw new Error('On no!')
-  // }
-  return contacts.patch<Contact, 'json'>(`/${contact.id}`, contact, options)
+  await delay(1000)
+  if (Math.random() > 0.75) {
+    throw new Error('On no!')
+  }
+  const c = await contacts.patch<Contact, 'json'>(`/${contact.id}`, contact, options)
+  await delay(1000)
+  return c
 }
 
 /**
@@ -95,7 +98,7 @@ export function patchContact(contact: Partial<ContactInfo> & { id: number }): Pr
  * @param options.filterInfo - any other filtering options
  * @returns an object with the total of results and an array with at most `perPage` (defaults to 10) elements in it
  */
-export function searchContacts(
+export async function searchContacts(
   searchText: string,
   {
     page,
@@ -115,6 +118,10 @@ export function searchContacts(
   if (page) query._page = page
   if (perPage) query._limit = perPage
 
+  await delay(500)
+  if (Math.random() > 0.75) {
+    throw new Error('On no!')
+  }
   return contacts.get('/', { query, responseAs: 'response', ...options }).then(async (res) => ({
     total: Number(res.headers.get('x-total-count')) || 0,
     results: (await res.json()) as Contact[],

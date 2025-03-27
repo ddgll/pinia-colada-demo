@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import type { Contact } from '@/api/contacts'
 
-const props = defineProps<{ contact: Contact }>()
+const props = defineProps<{ contact: Contact, mutating: boolean }>()
 const emit = defineEmits<{
   (e: 'update:contact', newContact: Contact): void
 }>()
@@ -39,7 +39,7 @@ function randomizeAvatar() {
       <img :key="copy.photoURL" class="w-40 h-40 mx-auto rounded-full" :src="copy.photoURL" />
       <button class="mt-1" @click="randomizeAvatar">Randomize photo</button>
     </div>
-    <img v-else class="w-40 h-40 mx-auto rounded-full" :src="contact.photoURL" />
+    <img v-else class="w-40 h-40 mx-auto rounded-full" :class="{ mutating }" :src="contact.photoURL" />
 
     <div class="space-y-2">
       <div class="space-y-1 font-medium leading-6 text-center">
@@ -73,8 +73,16 @@ function randomizeAvatar() {
       <hr />
 
       <div class="flex justify-end px-6 mx-auto space-x-2">
-        <button @click="startEdit()">Edit</button>
+        <button @click="startEdit()" :disabled="mutating">
+          {{ mutating ? 'Saving...' : 'Edit'}}
+        </button>
       </div>
     </template>
   </div>
 </template>
+
+<style scoped>
+.mutating {
+  opacity: 0.5;
+}
+</style>

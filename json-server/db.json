@@ -12,9 +12,9 @@
     },
     {
       "id": "2",
-      "firstName": "Eduardo",
-      "lastName": "Pinia",
-      "bio": "Pineapple pizza lover",
+      "firstName": "EduardOo",
+      "lastName": "Pinia Colada",
+      "bio": "Pineapple pizza lover Oo",
       "photoURL": "https://i.pravatar.cc/150?u=ananas",
       "isFavorite": false,
       "createdAt": "2023-03-05T12:45:00.000Z",
@@ -32,7 +32,7 @@
     },
     {
       "id": "4",
-      "firstName": "Ava",
+      "firstName": "Avaa",
       "lastName": "Caxi",
       "bio": "I did Rio's Carnaval disguised as a pineapple",
       "photoURL": "https://i.pravatar.cc/150?u=pinia",

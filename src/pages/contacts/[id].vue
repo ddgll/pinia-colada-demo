@@ -3,28 +3,20 @@ import { useRoute } from 'vue-router/auto'
 import ContactCard from '@/components/ContactCard.vue'
 import { updateContact as _updateContact, getContactById } from '@/api/contacts'
 import type { Contact } from '@/api/contacts'
-import { shallowRef, watch } from 'vue'
+import { shallowRef, watch, computed } from 'vue'
+import { useContactQuery, useContactMutation } from '@/queries/useContactsQuery'
 
 const route = useRoute('/contacts/[id]')
 
-function updateContact(contact: Partial<Contact> & { id: number }) {
-  return _updateContact({ ...contact, id: contact.id })
-}
-
-const contact = shallowRef<Contact>()
-watch(
-  () => route.params.id,
-  async (id) => {
-    contact.value = await getContactById(id)
-  },
-  { immediate: true },
-)
+const { data: contact, asyncStatus: queriing } = useContactQuery(() => route.params.id)
+const { mutate: updateContact, asyncStatus: mutating } = useContactMutation()
 </script>
 
 <template>
   <section class="flex-grow pt-6 md:pt-0">
     <ContactCard
-      v-if="contact"
+      v-if="queriing !== 'loading' && contact"
+      :mutating="mutating === 'loading'"
       :key="contact.id"
       :contact="contact"
       @update:contact="updateContact"

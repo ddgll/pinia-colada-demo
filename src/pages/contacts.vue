@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { searchContacts } from '@/api/contacts'
 import { useRouteQuery } from '@vueuse/router'
-import { onErrorCaptured, shallowRef, watch } from 'vue'
+import { refDebounced } from '@vueuse/core'
+import { useSearchContactQuery } from "@/queries/useContactsQuery"
+import { onErrorCaptured, shallowRef, watch, computed } from 'vue'
 
 const searchText = useRouteQuery('search', '', { mode: 'push' })
+const debouncedSearchText = refDebounced(searchText, 200)
 
-const searchResult = shallowRef<Awaited<ReturnType<typeof searchContacts>>>()
-watch(
-  searchText,
-  async () => {
-    searchResult.value = await searchContacts(searchText.value)
-  },
-  { immediate: true },
-)
+
+const { data: searchResult, asyncStatus, error, refetch } = useSearchContactQuery(debouncedSearchText)
+
+const searching = computed(() => asyncStatus.value === 'loading')
+const errored = computed(() => typeof error === Error)
 </script>
 
 <template>
@@ -22,12 +22,13 @@ watch(
     <div class="gap-4 contacts-search md:flex">
       <div>
         <form class="space-x-2" @submit.prevent>
-          <input v-model="searchText" autofocus type="search" placeholder="Eduardo" />
+          <input v-model="searchText" :disabled="searching" autofocus type="search" placeholder="Eduardo" />
+          <button type="button" @click="refetch" v-if="errored">Retry</button>
           <!-- NOTE: ensure no fetch is done on client while hydrating or this will cause
            a Hydration mismatch -->
-          <!-- <div v-if="asyncStatus === 'loading'"> -->
-          <!--   <span class="spinner" /><span> Fetching...</span> -->
-          <!-- </div> -->
+          <div v-if="searching">
+            <span class="spinner" /><span> Fetching...</span>
+          </div>
         </form>
 
         <ul>

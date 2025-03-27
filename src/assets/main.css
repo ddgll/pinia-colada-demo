@@ -1,4 +1,6 @@
 @import './base.css';
+@import "vue-toastification/dist/index.css";
+
 
 #app {
   max-width: 1280px;
