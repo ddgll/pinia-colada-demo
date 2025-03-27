@@ -7,7 +7,7 @@ export const useOptimisticQueries = <T extends { id: string | number }>(keyFunct
     const queryCache = useQueryCache();
     const toast = useToast();
     return {
-        onMutate(mutationData: T) {
+        onMutate: (mutationData: T) => {
             const queryKey = keyFunction(mutationData.id)
             const oldEntity = queryCache.getQueryData<T>(queryKey)
             const newEntity = {
@@ -18,13 +18,13 @@ export const useOptimisticQueries = <T extends { id: string | number }>(keyFunct
             queryCache.cancelQueries({ key: queryKey });
             return { oldEntity, newEntity }
         },
-        onError(err: Error, mutationData: T, context: { oldEntity?: T; newEntity?: T }): void {
+        onError: (err: Error, mutationData: T, context: { oldEntity?: T | undefined; newEntity?: T }): void => {
             toast.error(err.message)
             if (context?.oldEntity) {
                 queryCache.setQueryData(keyFunction(mutationData.id), context.oldEntity)
             }
         },
-        onSuccess(entity: T, mutationData: T) {
+        onSuccess: (entity: T, mutationData: T) => {
             queryCache.setQueryData(keyFunction(mutationData.id), entity)
             if (options?.searchKey) 
                 queryCache.invalidateQueries({ key: options.searchKey })
